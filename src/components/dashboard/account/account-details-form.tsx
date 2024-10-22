@@ -13,15 +13,32 @@ import MenuItem from '@mui/material/MenuItem';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Select from '@mui/material/Select';
 import Grid from '@mui/material/Unstable_Grid2';
+import { Controller, useForm } from 'react-hook-form';
+import { TextField } from '@mui/material';
 
 const states = [
-  { value: 'alabama', label: 'Alabama' },
+  { value: 'India', label: 'India' },
   { value: 'new-york', label: 'New York' },
   { value: 'san-francisco', label: 'San Francisco' },
   { value: 'los-angeles', label: 'Los Angeles' },
 ] as const;
 
-export function AccountDetailsForm(): React.JSX.Element {
+interface UserProps {
+  user: User | null | undefined;
+}
+const AccountDetailsForm: React.FC<UserProps> = ({ user }) => {
+  const { control, reset, formState: { errors } } = useForm<any>({
+    defaultValues: {
+      firstName: user?.first_name || '',
+    },
+  });
+
+  React.useEffect(() => {
+    if (user) {
+      reset(user);
+    }
+  }, [user, reset]);
+
   return (
     <form
       onSubmit={(event) => {
@@ -35,32 +52,72 @@ export function AccountDetailsForm(): React.JSX.Element {
           <Grid container spacing={3}>
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>First name</InputLabel>
-                <OutlinedInput defaultValue="Sofia" label="First name" name="firstName" />
+                <Controller
+                  name="first_name"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      type="text"
+                      label="First name"
+                      InputLabelProps={{ shrink: true }}
+                    />
+                  )}
+                />
               </FormControl>
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>Last name</InputLabel>
-                <OutlinedInput defaultValue="Rivers" label="Last name" name="lastName" />
+                <Controller
+                  name="last_name"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      type="text"
+                      label="Last name"
+                      InputLabelProps={{ shrink: true }}
+                    />
+                  )}
+                />
               </FormControl>
             </Grid>
             <Grid md={6} xs={12}>
-              <FormControl fullWidth required>
-                <InputLabel>Email address</InputLabel>
-                <OutlinedInput defaultValue="sofia@devias.io" label="Email address" name="email" />
+            <FormControl fullWidth required>
+                <Controller
+                  name="email"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      type="text"
+                      label="Email"
+                      InputLabelProps={{ shrink: true }}
+                    />
+                  )}
+                />
+              </FormControl>
+            </Grid>
+            <Grid md={6} xs={12}>
+            <FormControl fullWidth required>
+                <Controller
+                  name="mobile"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      type="text"
+                      label="Phone"
+                      InputLabelProps={{ shrink: true }}
+                    />
+                  )}
+                />
               </FormControl>
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl fullWidth>
-                <InputLabel>Phone number</InputLabel>
-                <OutlinedInput label="Phone number" name="phone" type="tel" />
-              </FormControl>
-            </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>State</InputLabel>
-                <Select defaultValue="New York" label="State" name="state" variant="outlined">
+                <InputLabel shrink>State</InputLabel>
+                <Select defaultValue="India" label="State" name="state" variant="outlined">
                   {states.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
                       {option.label}
@@ -70,9 +127,19 @@ export function AccountDetailsForm(): React.JSX.Element {
               </FormControl>
             </Grid>
             <Grid md={6} xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>City</InputLabel>
-                <OutlinedInput label="City" />
+            <FormControl fullWidth required>
+                <Controller
+                  name="city"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      type="text"
+                      label="City"
+                      InputLabelProps={{ shrink: true }}
+                    />
+                  )}
+                />
               </FormControl>
             </Grid>
           </Grid>
@@ -85,3 +152,4 @@ export function AccountDetailsForm(): React.JSX.Element {
     </form>
   );
 }
+export default AccountDetailsForm;

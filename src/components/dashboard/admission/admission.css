@@ -1,0 +1,42 @@
+.navigation-buttons {
+    margin-top:20px;
+}
+
+.step-admission {
+    padding: 16px;
+    margin: 16px 0;
+    border: 1px solid #ccc;
+}
+
+/* admission.css */
+.textarea-outlined {
+  position: relative;
+  border: 1px solid rgba(0, 0, 0, 0.23);
+  border-radius: 4px;
+  padding: 18.5px 14px;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-size: 1rem;
+  line-height: 1.1876em;
+  letter-spacing: 0.00938em;
+}
+
+.textarea-outlined:focus {
+  outline: none;
+  border-color: #3f51b5;
+}
+
+.textarea-outlined-label {
+  position: absolute;
+  top: -6px;
+  left: 14px;
+  background-color: white;
+  padding: 0 4px;
+  font-size: 0.75rem;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.textarea-outlined.shrink + .textarea-outlined-label {
+  transform: translate(0, -1.5em) scale(0.75);
+  transform-origin: top left;
+  transition: all 0.2s ease-out;
+}

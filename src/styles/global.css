@@ -31,3 +31,34 @@ html {
 body {
   height: 100%;
 }
+
+.MuiContainer-root {
+  margin-top: 20px!important;
+
+}
+
+.mui-17vbkzs-MuiFormControl-root-MuiTextField-root{
+  margin-top: 0px!important;
+}
+
+.mui-kjopsd-MuiStack-root {
+  margin-left: 30%;
+}
+span.present {
+  border: 1px solid green;
+  background: green;
+  color: #fff;
+  font-weight: 700;
+  padding: 5px 10px 5px 10px;
+  font-size: 14px;
+}
+
+span.absent {
+  border: 1px solid #fb5151e8;
+  background: #fb5151e8;
+  color: #fff;
+  font-weight: 700;
+  padding: 5px;
+  font-size: 14px;
+}
+

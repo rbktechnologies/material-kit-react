@@ -7,7 +7,7 @@
   "private": false,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "NEXT_LINT=false next build",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
@@ -32,11 +32,16 @@
     "@phosphor-icons/react": "2.1.6",
     "apexcharts": "3.49.2",
     "dayjs": "1.11.11",
+    "jspdf": "^2.5.1",
     "next": "14.2.4",
     "react": "18.3.1",
     "react-apexcharts": "1.4.1",
+    "react-barcode": "^1.5.3",
     "react-dom": "18.3.1",
+    "react-dropzone": "^14.2.3",
     "react-hook-form": "7.52.0",
+    "react-router-dom": "^6.25.1",
+    "rxjs": "^7.8.1",
     "zod": "3.23.8"
   },
   "devDependencies": {

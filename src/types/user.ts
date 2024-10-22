@@ -1,8 +1,39 @@
-export interface User {
+interface User {
   id: string;
   name?: string;
   avatar?: string;
   email?: string;
-
-  [key: string]: unknown;
+  address_line1?: string | null;
+  address_line2?: string | null;
+  admission_id?: string | null;
+  appearance?: string | null;
+  auth_data?: string | null;
+  city?: string | null;
+  comment?: string | null;
+  description?: string | null;
+  email_notifications?: boolean;
+  external_identifier?: string | null;
+  first_name?: string;
+  is_sent_welcome_email?: boolean;
+  language?: string | null;
+  last_access?: string;
+  last_name?: string;
+  last_page?: string;
+  location?: string | null;
+  mobile?: string | null;
+  password?: string;
+  pin?: string | null;
+  provider?: string;
+  role?: string;
+  state?: string | null;
+  status?: string;
+  tags?: string | null;
+  tfa_secret?: string | null;
+  theme_dark?: string | null;
+  theme_dark_overrides?: string | null;
+  theme_light?: string | null;
+  theme_light_overrides?: string | null;
+  title?: string | null;
+  token?: string | null;
+  username?: string | null;
 }

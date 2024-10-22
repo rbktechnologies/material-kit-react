@@ -24,7 +24,7 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
       <Box sx={{ display: 'flex', flex: '1 1 auto', flexDirection: 'column' }}>
         <Box sx={{ p: 3 }}>
           <Box component={RouterLink} href={paths.home} sx={{ display: 'inline-block', fontSize: 0 }}>
-            <DynamicLogo colorDark="light" colorLight="dark" height={32} width={122} />
+            <DynamicLogo colorDark="light" colorLight="dark" height={80} width={80} />
           </Box>
         </Box>
         <Box sx={{ alignItems: 'center', display: 'flex', flex: '1 1 auto', justifyContent: 'center', p: 3 }}>
@@ -46,20 +46,21 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
             <Typography color="inherit" sx={{ fontSize: '24px', lineHeight: '32px', textAlign: 'center' }} variant="h1">
               Welcome to{' '}
               <Box component="span" sx={{ color: '#15b79e' }}>
-                Devias Kit
+                Parihar Patil Classes, Parbhani
               </Box>
+              
             </Typography>
             <Typography align="center" variant="subtitle1">
-              A professional template that comes with ready-to-use MUI components.
-            </Typography>
+            फिजिक्स या विषयाबद्दल आज शैक्षणिक क्षेत्रात अनेक गैरसमज आहेत. बरेच विद्यार्थी व त्यांचे ऐकून काही पालक या विषयास अत्यंत कठीण विषय मानतात हे आपण समजू शकतो, परंतु बरेच शिक्षकदेखील या विषयास कठीण विषय संबोधतात हे मात्र चुकीचे. हा विषय कठीण नसून थोडा जास्त सरावाचा आहे इतके नक्की.            </Typography>
           </Stack>
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
             <Box
               component="img"
               alt="Widgets"
-              src="/assets/auth-widgets.png"
-              sx={{ height: 'auto', width: '100%', maxWidth: '600px' }}
+              src="https://pariharpatilclasses.in/wp-content/uploads/2020/07/Parihar-Sir-Hoarding-min-Copy.jpg"
+              sx={{ height: 'auto', width: '100%'}}
             />
+                        
           </Box>
         </Stack>
       </Box>

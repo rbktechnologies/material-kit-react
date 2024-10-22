@@ -16,12 +16,22 @@ import { usePopover } from '@/hooks/use-popover';
 
 import { MobileNav } from './mobile-nav';
 import { UserPopover } from './user-popover';
+import { authClient } from '@/lib/auth/client';
+import { getApiBaseURL } from '@/lib/get-api-base-url';
 
 export function MainNav(): React.JSX.Element {
   const [openNav, setOpenNav] = React.useState<boolean>(false);
-
+  const [data, setData] = React.useState<any>();
+  const didMountRef = React.useRef(false);
   const userPopover = usePopover<HTMLDivElement>();
+  const fetchData = async () => {
+    const response = await authClient.getUser();
+    setData(response.data);
+  }
 
+  React.useEffect(() => {
+    fetchData();
+  }, []);
   return (
     <React.Fragment>
       <Box
@@ -70,13 +80,13 @@ export function MainNav(): React.JSX.Element {
             <Avatar
               onClick={userPopover.handleOpen}
               ref={userPopover.anchorRef}
-              src="/assets/avatar.png"
+              src={`${getApiBaseURL()}assets/${data?.avatar}`} 
               sx={{ cursor: 'pointer' }}
             />
           </Stack>
         </Stack>
       </Box>
-      <UserPopover anchorEl={userPopover.anchorRef.current} onClose={userPopover.handleClose} open={userPopover.open} />
+      <UserPopover user={data} anchorEl={userPopover.anchorRef.current} onClose={userPopover.handleClose} open={userPopover.open} />
       <MobileNav
         onClose={() => {
           setOpenNav(false);
