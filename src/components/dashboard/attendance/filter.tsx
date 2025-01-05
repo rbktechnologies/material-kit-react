@@ -14,7 +14,7 @@ const attendanceType = [
 ] as const;
 
 const attendanceStatus = [
-    { value: "1", label: 'Prasent' },
+    { value: "1", label: 'Present' },
     { value: "0", label: 'Absent' }
 ] as const;
 

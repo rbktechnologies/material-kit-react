@@ -188,6 +188,9 @@ export function AdmissionTable({
                     <Box sx={{ display: 'flex', gap: 2 }}>
                       <PencilLineIcon size={20} onClick={() => onEdit(row)} />
                       <TrashIcon size={20} onClick={() => onDelete(row.id!)} />
+                      <Button style={{padding:'0px'}} type="button" variant="contained" color="primary">
+                            <span>Fees Details</span>
+                      </Button>
                     </Box>
                   </TableCell>
                   {/* <TableCell>

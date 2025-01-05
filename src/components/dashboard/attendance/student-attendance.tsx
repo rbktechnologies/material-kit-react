@@ -44,6 +44,7 @@ export function StudentAttendanceTable({
           <TableHead>
             <TableRow>
               <TableCell>Id</TableCell>
+              <TableCell>Barcode Id</TableCell>
               <TableCell>Name</TableCell>
               {/* <TableCell>Total Lecture Count</TableCell> */}
               <TableCell>Status</TableCell>
@@ -61,6 +62,7 @@ export function StudentAttendanceTable({
               rows.map((row, index) => (
                 <TableRow key={row.barcode_id}>
                   <TableCell>{startId + index}</TableCell>
+                  <TableCell>{row.barcode_id}</TableCell>
                   <TableCell>{row.student_name}</TableCell>
                   {/* <TableCell>{row.totalLectures}</TableCell> */}
                   <TableCell>

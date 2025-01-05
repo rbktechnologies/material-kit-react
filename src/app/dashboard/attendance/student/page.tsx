@@ -9,6 +9,8 @@ import FilterForm from '@/components/dashboard/attendance/filter';
 import FormDataProvider from '@/components/dashboard/admission/form-data-context';
 import { StudentAttendanceTable } from '@/components/dashboard/attendance/student-attendance';
 import { FormProvider, useForm } from 'react-hook-form';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid } from '@mui/material';
+import { getApiBaseURL } from '@/lib/get-api-base-url';
 
 export interface StudentAttendance {
   barcode_id: string;
@@ -27,6 +29,8 @@ export default function Page(): React.JSX.Element {
   const [totalCount, setTotalCount] = useState<number>(0);
   const [totalLectures, setTotalLectures] = useState<number>(0);
   const [filters, setFilters] = useState<any>({});
+  const [openDialog, setOpenDialog] = useState<boolean>(false); // State for dialog visibility
+  const [smsCount, setSmsCount] = useState<number>(0); // State for SMS count
   const didMountRef = useRef(false);
   const { setLoading } = useLoading();
   const methods = useForm();
@@ -51,15 +55,16 @@ export default function Page(): React.JSX.Element {
       console.log("`${filters.start_date}, ${filters.end_date}`", `${filters.start_date}T00:00:00, ${filters.end_date}T23:59:59`)
       const filterParams = new URLSearchParams();
       //[create_date_time][_between]=${startDate},${endDate}
-      const fields = 'id,date_created,date_updated,barcode_type,attendance_type,exam_name,create_date_time,barcode_id,admission.id,admission.first_name,admission.last_name,admission.branch,admission.course,admission.batch';
+      const fields = 'id,date_created,date_updated,barcode_type,attendance_type,exam_name,create_date_time,barcode_id,admission.id,admission.first_name,admission.last_name,admission.branch,admission.course,admission.batch,admission.status';
       filterParams.append('fields', fields);
+      filterParams.append('filter[_and][0][admission][status][_eq]', 'published');
       if (filters.branch) filterParams.append('filter[admission][branch][_eq]', filters.branch);
       if (filters.course) filterParams.append('filter[admission][course][_eq]', filters.course);
       if (filters.batch) filterParams.append('filter[admission][batch][_eq]', filters.batch);
       if (filters.start_date) filterParams.append('filter[create_date_time][_between]', `${filters.start_date}T00:00:00, ${filters.end_date}T23:59:59`);
       if (filters.attendance_type) filterParams.append('filter[attendance_type][_eq]', filters.attendance_type);
 
-      
+
       //limit=${rowsPerPage}&offset=${page * rowsPerPage}&meta=total_count&sort=-date_created&
       //console.log("url", `items/student_attendance?${filterParams.toString()}`)
       const response = await fetchWithAuth(`items/student_attendance?${filterParams.toString()}`);
@@ -68,6 +73,7 @@ export default function Page(): React.JSX.Element {
       }
 
       const studentFilterParams = new URLSearchParams();
+      studentFilterParams.append('filter[_and][0][_and][0][status][_eq]', 'published');
       if (filters.branch) studentFilterParams.append('filter[branch][_eq]', filters.branch);
       if (filters.course) studentFilterParams.append('filter[course][_eq]', filters.course);
       if (filters.batch) studentFilterParams.append('filter[batch][_eq]', filters.batch);
@@ -88,7 +94,7 @@ export default function Page(): React.JSX.Element {
   }
 
   const generateOutput = async (data: any, allStudents: any, filterAttendanceType: any = 'Regular', filterAttendanceStatus: any) => {
-    
+
     const studentMap = new Map<string, any>();
     const uniqueDates = new Set(
       data.map((item: any) => {
@@ -96,60 +102,59 @@ export default function Page(): React.JSX.Element {
         return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
       })
     );
-      console.log("uniqueDates",uniqueDates)
+    console.log("uniqueDates", uniqueDates)
     // Initialize studentMap with all students
-    if(uniqueDates.size){
+    if (uniqueDates.size) {
 
       allStudents.forEach((student: any) => {
         //const studentKey = `${student.first_name} ${student?.last_name}`;
         const studentKey = [student.first_name, student.last_name]
-        .filter(Boolean)  // Remove any falsy values (null, undefined, empty string)
-        .join(' '); 
+          .filter(Boolean)  // Remove any falsy values (null, undefined, empty string)
+          .join(' ');
         if (!studentMap.has(studentKey)) {
           studentMap.set(studentKey, {
             presentCount: 0,
             student_name: studentKey,
             barcode_id: student.barcode_id,
+            mobile: student.father_mobile,
             attendance_type: filterAttendanceType, // Assuming all students have the same default attendance type
             uniqueDates: uniqueDates.size,
             barcodeIdSet: new Set()
           });
         }
       });
-      console.log("data",data)
+      console.log("data", data)
       // Process the data to count attendance
       data.forEach((item: any) => {
         const studentKey = [item.admission.first_name, item.admission.last_name]
-        .filter(Boolean)  // Remove any falsy values (null, undefined, empty string)
-        .join(' '); 
+          .filter(Boolean)  // Remove any falsy values (null, undefined, empty string)
+          .join(' ');
         const studentInfo = studentMap.get(studentKey);
-  
+
         if (studentInfo) {
           studentInfo.barcodeIdSet.add(item.barcode_id);
-  
+
           if (item.attendance_type === filterAttendanceType) {
             studentInfo.presentCount++;
           }
         }
       });
-      console.log("studentMap",studentMap)
       // Prepare the final result
       const result: any[] = [];
-  
+
       studentMap.forEach(student => {
-        console.log("student",student)
-        console.log("filterAttendanceStatus",filterAttendanceStatus)
-        if(student.barcodeIdSet.size == filterAttendanceStatus){
+        if (student.barcodeIdSet.size == filterAttendanceStatus) {
           result.push({
             totalLectures: student.uniqueDates,
             student_name: student.student_name,
             barcode_id: student.barcode_id,
+            mobile: student.mobile,
             attendance_type: student.attendance_type,
             presentCount: student.barcodeIdSet.size // Count distinct barcode_id
           });
         }
       });
-    
+
       return result;
     } else {
       return [];
@@ -167,10 +172,72 @@ export default function Page(): React.JSX.Element {
     setFilters(filters);
     setPage(0);
   };
+
+  const handleSendSMS = () => {
+    setSmsCount(data.length); // Set the SMS count
+    setOpenDialog(true); // Open the confirmation dialog
+  };
+  const sendSMS = async (smsData: any) => {
+    try {
+      const response = await fetch(`${getApiBaseURL()}my-api/send-sms`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(smsData)  // Send the output object
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json(); // Get the response data
+      console.log('Success:', result);       // Handle success
+    } catch (error) {
+      console.error('Error sending data:', error); // Handle error
+    }
+  };
   const handlePageChange = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
   };
+  const handleDialogClose = () => {
+    setOpenDialog(false);
+  };
 
+  const confirmSendSMS = () => {
+    setOpenDialog(false); // Close the confirmation dialog
+    // Proceed to send SMS
+    const absentDate = filters.start_date;
+    // const response_sms = {
+    //   "message_template": "Dear {name}, is Absent on Date {date} Regards, PARIHAR PATIL PHYSICS CLASSES ATISHS",
+    //   "recipients": [
+    //     {
+    //       "mobile": "+919405490959",
+    //       "name": "Deepak Shinde",
+    //       "date": "22/10/2024"
+    //     },
+    //     {
+    //       "mobile": "+917057737045",
+    //       "name": "Jyoti Shinde",
+    //       "date": "22/10/2024"
+    //     }
+    //   ]
+    // };
+    const smsData = {
+      message_template: `Dear {name}, is Absent on Date {date} Regards, PARIHAR PATIL PHYSICS CLASSES ATISHS`,
+      recipients: data.map((student: any) => ({
+        mobile: `+91${student.mobile}`, // Format mobile number
+        name: student.student_name,      // Get the student's name
+        date: formatAbsentDate(absentDate)           // Format the date
+      }))
+    };
+    sendSMS(smsData);
+  };
+
+  const formatAbsentDate = (absentDate: any) => {
+    const [year, month, day] = absentDate.split('-');
+    return `${day}/${month}/${year}`;
+  };
   return (
     <Stack spacing={3}>
       <FormDataProvider>
@@ -178,6 +245,11 @@ export default function Page(): React.JSX.Element {
           <FilterForm onFilter={handleFilter} /> {/* Add the FilterForm component */}
         </FormProvider>
       </FormDataProvider>
+      <Grid item md={12} xs={12}>
+        <Button type="button" variant="contained" color="primary" onClick={handleSendSMS} style={{ float: 'right' }}>
+          Send SMS
+        </Button>
+      </Grid>
       <StudentAttendanceTable
         count={totalCount}
         page={page}
@@ -185,6 +257,22 @@ export default function Page(): React.JSX.Element {
         rowsPerPage={rowsPerPage}
         onPageChange={handlePageChange}
       />
+      <Dialog open={openDialog} onClose={handleDialogClose}>
+        <DialogTitle>Confirm Send SMS</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to send SMS to {smsCount} recipients?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={confirmSendSMS} color="primary" autoFocus>
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Stack>
   );
 }
